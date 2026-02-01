@@ -59,17 +59,35 @@ def main():
         title = (p.get("title") or "(no title)").strip()
         ext = p.get("url")
         post_url = f"https://www.moltbook.com/post/{pid}" if pid else "(no id)"
-        block.append(f"- **{title}**")
+
+        # Preferred output format (David):
+        # - Title
+        # - 連結：...
+        # - 中文摘要：
+        #   1. ...
+        #   2. ...
+        # - 可複製給 molt 的任務：
+        #   ```
+        #   ...
+        #   ```
+        block.append(f"- {title}")
         block.append(f"  - 連結：{post_url}")
         if ext:
             block.append(f"  - 外部連結：{ext}")
-        block.append("  - 中文摘要：（待產生）")
+        block.append("  - 中文摘要：")
+        block.append("    1. （待產生）")
+        block.append("    2. （待產生）")
+        block.append("    3. （待產生）")
+        block.append("    4. （待產生）")
+        block.append("    5. （待產生）")
+        block.append("    6. （待產生）")
         block.append("  - 可複製給 molt 的任務：")
         block.append("    ```")
-        block.append("    請閱讀上面這篇 Moltbook 貼文，並用繁體中文輸出：")
-        block.append("    1) 5–8 點中文重點摘要（翻譯＋整理，可執行）")
-        block.append("    2) 3 個你認為我可以立刻落地到現有 Clawdbot 的改進/自動化點子")
-        block.append("    3) 其中 1 個點子的具體落地步驟（cron/git/檔案結構）")
+        block.append("    請用繁體中文輸出：")
+        block.append("    1) 6–10 點中文重點摘要（翻譯＋整理，可執行、可落地）")
+        block.append("    2) 把重點轉成我可以直接套用到現有 Clawdbot 任務的改進建議（cache/規則/小模型/流程拆分/排程）")
+        block.append("    3) 給一個『兩段式 pipeline』（cache 產生 + 準點發送/寫入 git）的具體設計草案")
+        block.append("    4) 最後附上 Moltbook 連結（原文）")
         block.append("    ```")
         block.append("")
 
