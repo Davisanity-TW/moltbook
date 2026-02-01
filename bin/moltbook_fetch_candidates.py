@@ -59,8 +59,15 @@ def http_json(url: str, api_key: str):
         },
         method="GET",
     )
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        return json.loads(resp.read().decode("utf-8"))
+    # Moltbook API can be slow at times; use a longer timeout + light retry.
+    last_err = None
+    for _ in range(3):
+        try:
+            with urllib.request.urlopen(req, timeout=120) as resp:
+                return json.loads(resp.read().decode("utf-8"))
+        except Exception as e:  # noqa: BLE001
+            last_err = e
+    raise last_err
 
 
 def fetch_posts(api_key: str, sort: str, want: int):
