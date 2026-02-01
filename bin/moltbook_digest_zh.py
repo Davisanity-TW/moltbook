@@ -209,33 +209,45 @@ def idea_bullets(text: str):
 def render_entry(p: dict, score: int) -> str:
     title = (p.get("title") or "(no title)").strip()
     content = (p.get("content") or "").strip()
-    url = p.get("url")
-    sub = (p.get("submolt") or {}).get("name")
+    ext_url = p.get("url")
     pid = p.get("id")
-    created = p.get("created_at")
+
+    # Moltbook post permalink (best-effort)
+    post_url = f"https://www.moltbook.com/post/{pid}" if pid else "(no id)"
+
+    snippet = re.sub(r"\s+", " ", content).strip()
+    if len(snippet) > 260:
+        snippet = snippet[:260] + "…"
+
+    # Chinese summary (lightweight)
+    if has_cjk(content):
+        zh_summary = snippet
+    else:
+        zh_summary = f"主題：{title}。重點（原文摘錄）：{snippet}"
 
     lines = []
     lines.append(f"- **{title}**")
-    # Actionable section
-    lines.append(f"  - submolt: `{sub}` | score: `{score}` | created: `{created}`")
-    if pid:
-        lines.append(f"  - post_id: `{pid}`")
-    if url:
-        lines.append(f"  - link: {url}")
-    if content:
-        snippet = re.sub(r"\s+", " ", content)
-        if len(snippet) > 260:
-            snippet = snippet[:260] + "…"
-        lines.append(f"  - snippet: {snippet}")
-        if not has_cjk(content):
-            lines.append(f"  - {zh_hint(title, content)}")
-    fulltext = f"{title} {content} {url or ''} {sub or ''}"
+    lines.append(f"  - 連結：{post_url}")
+    if ext_url:
+        lines.append(f"  - 外部連結：{ext_url}")
+    lines.append(f"  - 中文摘要：{zh_summary}")
+
+    fulltext = f"{title} {content} {ext_url or ''}".lower()
     ideas = idea_bullets(fulltext)
     lines.append("  - 可直接用的 idea（Clawdbot / 工作流）：")
     for i, idea in enumerate(ideas, 1):
         lines.append(f"    {i}. {idea}")
-    lines.append("  - 你可以怎麼問我：")
-    lines.append("    - 『把第 2 點做成 cron + git 週報』或『幫我把它接進現有流程』")
+
+    lines.append("  - 可複製給 molt 的任務（直接貼這段我就會做）：")
+    lines.append("    ```")
+    lines.append("    請閱讀下面這篇 Moltbook 貼文，並用繁體中文輸出：")
+    lines.append("    1) 5–8 點中文重點摘要（偏研究/可執行）")
+    lines.append("    2) 3 個可以落地到我現有 Clawdbot 的自動化/工作流 idea（最好能接 cron + git）")
+    lines.append("    3) 若要實作其中 1 個 idea：給我具體步驟/檔案/cron 設定草案")
+    lines.append(f"\n    Moltbook 連結：{post_url}")
+    if ext_url:
+        lines.append(f"    外部連結：{ext_url}")
+    lines.append("    ```")
 
     return "\n".join(lines)
 
@@ -281,7 +293,7 @@ def main():
 
     block = []
     block.append(f"## {day} {hhmm} (Asia/Taipei)\n")
-    block.append("本輪精選（含探索模式，可能含低關聯貼文）：")
+    block.append("本輪精選（來源：熱門前100 + 最新150；已篩選/摘要/給可落地點子）：")
 
     if not top:
         block.append("- （本輪沒有找到明顯相關的貼文；可能需要擴大關鍵字或改抓特定 submolt。）")
