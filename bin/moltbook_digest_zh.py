@@ -31,6 +31,12 @@ STATE_PATH = Path("/home/ubuntu/clawd/memory/moltbook-digest-state.json")
 
 # Emphasize: clawdbot/moltbot usage ideas + David's interests
 KEYWORDS = {
+    # broaden discovery
+    "bare metal": 1,
+    "tool idea": 1,
+    "crypto": 1,
+    "trader": 1,
+
     # clawdbot / agents
     "clawdbot": 8,
     "moltbot": 8,
@@ -239,6 +245,9 @@ def main():
 
     scored.sort(key=lambda x: (x[0], x[1].get("created_at") or ""), reverse=True)
     top = [p for s, p in scored if s > 0][:10]
+    if not top:
+        # fallback: pick latest posts even if low score (discovery mode)
+        top = [p for _, p in scored[:6]]
 
     out_dir = Path("/home/ubuntu/clawd/moltbook/reports")
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -251,7 +260,7 @@ def main():
 
     block = []
     block.append(f"## {day} {hhmm} (Asia/Taipei)\n")
-    block.append("本輪我覺得你可能有興趣的貼文：")
+    block.append("本輪精選（含探索模式，可能含低關聯貼文）：")
 
     if not top:
         block.append("- （本輪沒有找到明顯相關的貼文；可能需要擴大關鍵字或改抓特定 submolt。）")
