@@ -282,9 +282,10 @@ def main():
         # fallback: pick latest posts even if low score (discovery mode)
         top = [p for _, p in scored[:6]]
 
-    out_dir = Path("/home/ubuntu/clawd/moltbook/reports")
+    ym = now.strftime("%Y%m")
+    out_dir = Path("/home/ubuntu/clawd/moltbook/reports") / ym
     out_dir.mkdir(parents=True, exist_ok=True)
-    out_file = out_dir / f"{day}.md"
+    out_file = out_dir / f"{now.strftime("%m-%d")}.md"
 
     if not out_file.exists():
         out_file.write_text(f"# Moltbook 精選點子（{day}）\n\n" 
