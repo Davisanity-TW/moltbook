@@ -128,6 +128,59 @@ def zh_hint(title: str, content: str) -> str:
     return f"中文提示：此貼文可能在討論「{t}」；重點片段：{c}"
 
 
+
+
+def idea_bullets(text: str):
+    """Return 3 actionable idea bullets in zh-Hant based on keywords."""
+    t = (text or '').lower()
+    ideas = []
+
+    def add(*xs):
+        for x in xs:
+            if x not in ideas:
+                ideas.append(x)
+
+    # clawdbot/moltbot
+    if 'clawdbot' in t or 'moltbot' in t or 'agent' in t:
+        add(
+            "把這個做成一個 cron/heartbeat：定期抓資料 → 產生摘要 → 推到 git（像你現在的 moltbook digest）。",
+            "把流程拆成兩段：① 產生快取（cache）② 準點發送/寫入 git，避免延遲或 API 抖動影響準時性。",
+            "把輸出改成『可機器解析』格式（JSON/固定段落），方便後續自動彙整、查詢與回填。"
+        )
+
+    # k8s/storage
+    if 'kubernetes' in t or 'k8s' in t or 'cni' in t or 'etcd' in t:
+        add(
+            "建立『每日 K8s 健康巡檢』：節點資源/Pod 重啟/事件 top N → 產出清單與建議動作。",
+            "針對 CNI/網路：加一個『最近 24h 網路錯誤關鍵字』彙整（conntrack/MTU/timeout）並附定位指令。",
+            "把 troubleshooting SOP（像你 MinIO 的）寫成 wiki 頁＋每天增量補齊（commit 當作學習日誌）。"
+        )
+    if 'minio' in t or 's3' in t or 'erasure' in t or 'healing' in t:
+        add(
+            "把 log 關鍵字（例如 canceling remote connection）→ source trace → SOP 變成固定模板，遇到新錯就自動生成一頁。",
+            "用 `mc admin heal --json` 落盤成 jsonl，定期把 Items[] 轉成『今日 heal 清單/失敗清單』並推 git。",
+            "針對特定 bucket/prefix 建立『一鍵 heal 指令＋結果解析』腳本，縮小範圍避免掃全站。"
+        )
+
+    # markets/finance
+    if any(k in t for k in ['vix','sp500','s&p','nasdaq','earnings','macro','gold','silver','bitcoin','btc']):
+        add(
+            "把 VIX/金銀/BTC 做成固定『風險儀表板』段落（數值 + 變化 + 3 行解讀 + 事件連結），每天自動寫入週報。",
+            "把重大事件（財報/Fed/地緣）做成『事件→資產反應』對照表，累積成自己的交易/研究筆記庫。",
+            "把 watchlist 的資料抓取與格式化獨立成工具，報告只做『解讀』，降低格式維護成本。"
+        )
+
+    # fallback
+    if not ideas:
+        ideas = [
+            "把這篇貼文的想法收斂成『一個可重複的自動化流程』，先做 MVP（每天一次即可）。",
+            "把輸出固定成 Markdown 模板（標題/重點/下一步），之後才能穩定累積成可搜尋的知識庫。",
+            "遇到不確定的地方先加 TODO + 可執行的驗證指令，讓後續能快速補完。"
+        ]
+
+    return ideas[:3]
+
+
 def render_entry(p: dict, score: int) -> str:
     title = (p.get("title") or "(no title)").strip()
     content = (p.get("content") or "").strip()
@@ -138,6 +191,7 @@ def render_entry(p: dict, score: int) -> str:
 
     lines = []
     lines.append(f"- **{title}**")
+    # Actionable section
     lines.append(f"  - submolt: `{sub}` | score: `{score}` | created: `{created}`")
     if pid:
         lines.append(f"  - post_id: `{pid}`")
@@ -150,6 +204,14 @@ def render_entry(p: dict, score: int) -> str:
         lines.append(f"  - snippet: {snippet}")
         if not has_cjk(content):
             lines.append(f"  - {zh_hint(title, content)}")
+    fulltext = f"{title} {content} {url or ''} {sub or ''}"
+    ideas = idea_bullets(fulltext)
+    lines.append("  - 可直接用的 idea（Clawdbot / 工作流）：")
+    for i, idea in enumerate(ideas, 1):
+        lines.append(f"    {i}. {idea}")
+    lines.append("  - 你可以怎麼問我：")
+    lines.append("    - 『把第 2 點做成 cron + git 週報』或『幫我把它接進現有流程』")
+
     return "\n".join(lines)
 
 
