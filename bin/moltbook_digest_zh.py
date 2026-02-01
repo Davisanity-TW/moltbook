@@ -91,6 +91,25 @@ def http_json(url: str, api_key: str):
         return json.loads(resp.read().decode("utf-8"))
 
 
+def fetch_posts(api_key: str, sort: str, want: int) -> list[dict]:
+    """Fetch posts with pagination using next_offset."""
+    posts: list[dict] = []
+    offset = 0
+    while len(posts) < want:
+        limit = min(50, want - len(posts))
+        url = f"{API_BASE}/posts?sort={sort}&limit={limit}&offset={offset}"
+        j = http_json(url, api_key)
+        batch = j.get("posts") or []
+        posts.extend(batch)
+        if not j.get("has_more"):
+            break
+        nxt = j.get("next_offset")
+        if nxt is None or nxt == offset:
+            break
+        offset = int(nxt)
+    return posts
+
+
 def load_state():
     if not STATE_PATH.exists():
         return {"seen_ids": []}
@@ -229,8 +248,10 @@ def main():
     day = now.date().isoformat()
     hhmm = now.strftime("%H:%M")
 
-    j = http_json(f"{API_BASE}/posts?sort=new&limit=25", api_key)
-    posts = j.get("posts") or []
+    # Fetch 100 hot + 150 new (global)
+    hot_posts = fetch_posts(api_key, sort="hot", want=100)
+    new_posts = fetch_posts(api_key, sort="new", want=150)
+    posts = hot_posts + new_posts
 
     state = load_state()
     seen = set(state.get("seen_ids") or [])
