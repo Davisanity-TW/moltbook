@@ -31,43 +31,164 @@ STATE_PATH = Path("/home/ubuntu/clawd/memory/moltbook-digest-state.json")
 
 # Emphasize: clawdbot/moltbot usage ideas + David's interests
 KEYWORDS = {
-    # broaden discovery
-    "bare metal": 1,
-    "tool idea": 1,
-    "crypto": 1,
-    "trader": 1,
+    # --- core interest: clawdbot / moltbots / agent tooling ---
+    "clawdbot": 10,
+    "moltbot": 10,
+    "openclaw": 8,
+    "clawd": 6,
+    "agent": 4,
+    "agents": 4,
+    "ai agent": 5,
+    "autonomous": 2,
+    "automation": 4,
+    "workflow": 4,
+    "pipeline": 3,
+    "orchestration": 3,
+    "tool": 3,
+    "tools": 3,
+    "tool calling": 4,
+    "mcp": 4,
+    "webhook": 3,
+    "cron": 3,
+    "scheduler": 2,
+    "github": 2,
+    "actions": 2,
+    "telegram": 2,
+    "signal": 2,
+    "slack": 2,
 
-    # clawdbot / agents
-    "clawdbot": 8,
-    "moltbot": 8,
-    "agent": 3,
-    "tool": 2,
-    "mcp": 2,
-    "workflow": 2,
+    # 中文關鍵字（moltbot/clawdbot 應用）
+    "自動化": 5,
+    "工作流": 5,
+    "排程": 4,
+    "腳本": 3,
+    "工具": 3,
+    "代理": 3,
+    "智能體": 4,
+    "機器人": 3,
+    "通知": 2,
 
-    # infra/storage/k8s
-    "minio": 6,
-    "s3": 2,
+    # --- AI applications ---
+    "llm": 3,
+    "rag": 3,
+    "embedding": 2,
+    "inference": 3,
+    "gpu": 3,
+    "cuda": 2,
+    "nvidia": 2,
+    "openai": 2,
+    "prompt": 2,
+    "eval": 2,
+    "agents sdk": 2,
+
+    # 中文（AI 應用）
+    "ai": 2,
+    "應用": 2,
+    "提示詞": 3,
+    "向量": 2,
+    "推理": 2,
+    "模型": 2,
+
+    # --- Kubernetes / cloud native ---
+    "kubernetes": 6,
+    "k8s": 6,
+    "helm": 3,
+    "cni": 3,
+    "cilium": 3,
+    "calico": 3,
+    "ingress": 2,
+    "service mesh": 2,
+    "istio": 2,
+    "etcd": 3,
+    "kubelet": 2,
+    "pod": 2,
+    "node": 2,
+    "operator": 3,
+
+    # 中文（K8s）
+    "容器": 3,
+    "集群": 3,
+    "叢集": 3,
+    "網路": 2,
+    "網路插件": 2,
+
+    # --- Storage / infra ---
+    "storage": 5,
+    "s3": 3,
+    "minio": 7,
     "erasure": 3,
     "healing": 3,
-    "kubernetes": 5,
-    "k8s": 5,
-    "cni": 2,
-    "etcd": 2,
-    "storage": 4,
-    "nvme": 2,
+    "ceph": 4,
+    "rook": 2,
+    "longhorn": 3,
+    "zfs": 3,
+    "nfs": 2,
+    "iscsi": 2,
+    "nvme": 3,
+    "nvmeof": 2,
+    "lvm": 2,
+    "raid": 2,
+    "latency": 2,
+    "throughput": 2,
+    "observability": 2,
+    "prometheus": 2,
+    "grafana": 2,
+    "loki": 2,
 
-    # markets/finance
-    "vix": 3,
-    "macro": 2,
-    "nasdaq": 2,
-    "sp500": 2,
-    "s&p": 2,
-    "gold": 2,
-    "silver": 2,
-    "bitcoin": 2,
-    "btc": 2,
-    "earnings": 2,
+    # 中文（Storage）
+    "儲存": 5,
+    "存儲": 5,
+    "物件儲存": 4,
+    "檔案系統": 3,
+    "磁碟": 3,
+    "硬碟": 2,
+    "延遲": 2,
+    "吞吐": 2,
+
+    # --- Markets / finance ---
+    "markets": 4,
+    "market": 3,
+    "finance": 4,
+    "macro": 3,
+    "earnings": 3,
+    "guidance": 2,
+    "cpi": 2,
+    "pce": 2,
+    "fed": 3,
+    "rate": 2,
+    "cut": 1,
+    "yield": 2,
+    "treasury": 2,
+    "bond": 2,
+    "dxy": 2,
+    "usd": 1,
+    "vix": 4,
+    "volatility": 3,
+    "options": 2,
+    "gold": 3,
+    "xau": 2,
+    "silver": 3,
+    "xag": 2,
+    "bitcoin": 3,
+    "btc": 3,
+    "crypto": 2,
+    "etf": 2,
+
+    # 中文（財經/市場）
+    "財經": 5,
+    "市場": 5,
+    "美股": 3,
+    "台股": 2,
+    "匯率": 2,
+    "美元": 2,
+    "殖利率": 2,
+    "通膨": 2,
+    "降息": 2,
+    "恐慌": 2,
+    "黃金": 3,
+    "白銀": 3,
+    "比特幣": 3,
+    "加密": 2,
 }
 
 
@@ -261,18 +382,14 @@ def main():
     hhmm = now.strftime("%H:%M")
 
     # Fetch 100 hot + 150 new (global)
-    hot_posts = fetch_posts(api_key, sort="hot", want=100)
-    new_posts = fetch_posts(api_key, sort="new", want=150)
+    hot_posts = fetch_posts(api_key, sort="hot", want=200)
+    new_posts = fetch_posts(api_key, sort="new", want=400)
     posts = hot_posts + new_posts
-
+    # Note: do NOT skip previously-seen posts here.
+    # We want discovery even if a post stays hot for a while.
     state = load_state()
-    seen = set(state.get("seen_ids") or [])
-
     scored = []
     for p in posts:
-        pid = p.get("id")
-        if pid and pid in seen:
-            continue
         s = score_post(p)
         scored.append((s, p))
 
@@ -304,12 +421,8 @@ def main():
 
     block.append("")
     out_file.write_text(out_file.read_text(encoding="utf-8") + "\n" + "\n".join(block), encoding="utf-8")
-
-    for p in posts:
-        pid = p.get("id")
-        if pid:
-            seen.add(pid)
-    state["seen_ids"] = list(seen)[-800:]
+    # Persist minimal state (timestamp)
+    state['last_run_at'] = now.isoformat()
     save_state(state)
 
     print(str(out_file))
