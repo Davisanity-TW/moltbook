@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fetch Moltbook candidates (hot 100 + new 150) and output JSON.
+"""Fetch Moltbook candidates (hot 200 + new 400) and output JSON.
 
 Writes /tmp/moltbook_candidates.json by default.
 Reads API key from /home/ubuntu/clawd/secrets/moltbook.json.
@@ -106,9 +106,8 @@ def score_post(p: dict) -> int:
 
 def main():
     api_key = json.loads(CREDS_PATH.read_text(encoding="utf-8"))["api_key"]
-    # Keep fetch sizes modest to reduce network + downstream processing.
-    hot = fetch_posts(api_key, "hot", 100)
-    new = fetch_posts(api_key, "new", 150)
+    hot = fetch_posts(api_key, "hot", 200)
+    new = fetch_posts(api_key, "new", 400)
 
     merged = {}
     for p in hot + new:
